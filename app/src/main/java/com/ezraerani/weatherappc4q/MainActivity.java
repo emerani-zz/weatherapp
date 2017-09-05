@@ -2,40 +2,62 @@ package com.ezraerani.weatherappc4q;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-
-import com.ezraerani.weatherappc4q.responsemodels.Period;
-import com.ezraerani.weatherappc4q.responsemodels.WeatherResponse;
-
-import java.util.ArrayList;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
+
+    MainActivityPresenter presenter;
+    RecyclerViewAdapter adapter;
+    RecyclerView recyclerView;
+    private boolean isFahrenheit = true;
+    Button changeUnitsButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ArrayList<Period> weatherPeriods = new ArrayList<>();
+        presenter = new MainActivityPresenter(this);
+        initViews();
 
-        AerisClient aerisClient = new RetrofitClient().getAerisClient();
-        Call<WeatherResponse> weatherResponseCall = aerisClient.forecast("11101",
-                getString(R.string.client_id), getString(R.string.client_secret));
+    }
 
-        weatherResponseCall.enqueue(new Callback<WeatherResponse>() {
+    private void initViews(){
+        changeUnitsButton = (Button) findViewById(R.id.changeUnitsButton);
+        changeUnitsButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
-                weatherPeriods.addAll(response.body().getResponse().get(0).getPeriods());
-            }
-
-            @Override
-            public void onFailure(Call<WeatherResponse> call, Throwable t) {
-                Log.d("onFailure", t.getMessage());
+            public void onClick(View view) {
+                toggleUnits();
             }
         });
+
+        adapter = new RecyclerViewAdapter(presenter.getWeatherPeriods(), this);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false));
+    }
+
+    private void toggleUnits() {
+        isFahrenheit = !isFahrenheit();
+        String buttonText;
+        if (isFahrenheit) {
+            buttonText = getString(R.string.show_celsius);
+        } else {
+            buttonText = getString(R.string.show_fahrenheit);
+        }
+        changeUnitsButton.setText(buttonText);
+        adapter.notifyDataSetChanged();
+    }
+
+    public boolean isFahrenheit() {
+        return isFahrenheit;
+    }
+
+
+    public void onWeatherDataReceived() {
+        adapter.notifyDataSetChanged();
     }
 }

@@ -2,4 +2,10 @@
     <string name="app_name">WeatherAppC4Q</string>
     <string name="client_id">bvbTkPGmARMOwLJykgeEX</string>
     <string name="client_secret">Om0h5bTSxGcQiwpazAr1aeO9gN5p2WeMnsKMfe5E</string>
+    <string name="degrees_F">°F</string>
+    <string name="degrees_C">°C</string>
+    <string name="high">High:\u0020</string>
+    <string name="low">Low:\u0020</string>
+    <string name="show_celsius">Show Celsius</string>
+    <string name="show_fahrenheit">Show Fahrenheit</string>
 </resources>
